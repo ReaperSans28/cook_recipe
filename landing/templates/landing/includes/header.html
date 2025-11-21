@@ -1,0 +1,34 @@
+<header data-bs-theme="dark">
+    <div class="collapse text-bg-dark" id="navbarHeader">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-md-7 py-4">
+                    <h4>О библиотеке</h4>
+                    <p class="text-body-secondary">
+                        Добро пожаловать в нашу библиотеку! Здесь вы найдете книги на любой вкус,
+                        сможете следить за новостями и делиться своими находками.
+                    </p>
+                </div>
+                <div class="col-sm-4 offset-md-1 py-4">
+                    <h4>{% if user.is_authenticated %}Профиль{% else %}Вход{% endif %}</h4>
+                    <ul class="list-unstyled">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a href="{% url 'landing:index' %}" class="navbar-brand d-flex align-items-center">
+                <strong>Библиотека</strong>
+            </a>
+            <div class="d-flex align-items-center">
+                    <span class="text-white me-3">Привет!</span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader"
+                        aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
