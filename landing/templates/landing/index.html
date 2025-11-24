@@ -4,14 +4,165 @@
 <main>
     <section class="py-5 text-center container">
         <div class="row py-lg-5">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <h1 class="fw-light">Добро пожаловать в библиотеку</h1>
+            <div class="col-lg-10 col-xl-8 mx-auto">
+                <h1 class="fw-bold">Онлайн-платформа самообучения LearnHub</h1>
                 <p class="lead text-body-secondary">
-                    Наша библиотека предлагает широкий выбор книг для всех возрастов и интересов. 
-                    Откройте для себя новые миры, изучайте науки, наслаждайтесь художественной литературой.
+                    Практические курсы, живая обратная связь и современный дизайн, который не отвлекает от учёбы.
+                    Подключайтесь к потокам, изучайте материалы в удобном темпе и собирайте собственное портфолио.
                 </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a class="btn btn-primary btn-lg" href="{% url 'users:register' %}">Начать обучение</a>
+                    {% if user.is_authenticated and user.is_instructor %}
+                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'course_create' %}">Создать курс</a>
+                    {% else %}
+                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'users:login' %}">Войти</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </section>
+
+    <section class="py-5 bg-body-tertiary">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h3 class="card-title">Учитесь в удобном темпе</h3>
+                            <p class="card-text text-body-secondary">
+                                Каждый курс разбит на короткие уроки с практикой. Возвращайтесь к материалам
+                                когда угодно — прогресс сохранится.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h3 class="card-title">Авторы — практики</h3>
+                            <p class="card-text text-body-secondary">
+                                Инструкторы делятся опытом, добавляют чек-листы и отвечают на вопросы прямо из
+                                интерфейса платформы.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h3 class="card-title">API для автоматизации</h3>
+                            <p class="card-text text-body-secondary">
+                                Вся платформа построена на DRF — подключайте мобильные приложения, чат-ботов
+                                или интеграции с LMS через JSON.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="album py-5">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="mb-0">Актуальные курсы</h2>
+                <a class="text-decoration-none" href="/api/courses/">Смотреть через API →</a>
+            </div>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for course in courses %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            {% if course.preview_image %}
+                                <img src="{{ course.preview_image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center bg-dark text-white" style="height: 220px;">
+                                    <span class="fw-semibold">{{ course.title|truncatewords:3 }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary text-uppercase">{{ course.get_level_display }}</span>
+                                    {% if course.is_free %}
+                                        <span class="badge bg-success">Бесплатно</span>
+                                    {% endif %}
+                                </div>
+                                <h5 class="card-title">{{ course.title }}</h5>
+                                <p class="card-text text-body-secondary flex-grow-1">{{ course.short_description|default:course.description|truncatewords:24 }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ course.duration_hours }} ч</small>
+                                    <small class="text-muted">{{ course.lessons.all|length }} урок(ов)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">Пока нет опубликованных курсов. Самое время создать первый!</p>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if user.is_authenticated and user.is_instructor %}
+                <div class="text-center mt-4">
+                    <a class="btn btn-outline-primary" href="{% url 'course_create' %}">Добавить курс</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="py-5 bg-body-tertiary">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="mb-0">Новые уроки</h2>
+                <a class="text-decoration-none" href="/api/lessons/">JSON-лента →</a>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for lesson in latest_lessons %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge text-bg-dark">{{ lesson.course.title|truncatewords:4 }}</span>
+                                    <small class="text-muted">{{ lesson.duration_minutes }} мин</small>
+                                </div>
+                                <h5 class="card-title">{{ lesson.title }}</h5>
+                                <p class="card-text text-body-secondary">{{ lesson.content|truncatewords:26 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">Как только появятся опубликованные уроки, они появятся здесь.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {% if user.is_authenticated and user.is_instructor %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Быстрое создание курса</h3>
+                            <p class="text-body-secondary">Эта форма повторяет админку, но остаётся в общем стиле сайта.</p>
+                            <a href="{% url 'course_create' %}" class="btn btn-primary">Заполнить форму</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h3 class="card-title mb-3">Добавить урок</h3>
+                            <p class="text-body-secondary">Создавайте контент и проверяйте всё сразу в интерфейсе платформы.</p>
+                            <a href="{% url 'lesson_create' %}" class="btn btn-outline-primary">Создать урок</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 </main>
 {% endblock %}

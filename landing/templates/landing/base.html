@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en" data-bs-theme="auto">
+<html lang="ru" data-bs-theme="auto">
 <head>
     <meta charset="utf-8">
-    <title>Библиотека</title>
+    <title>LearnHub</title>
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/album/">
-    <script src="{% static '/js/color-modes.js' %}"></script>
+    <script src="{% static 'js/color-modes.js' %}"></script>
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <meta name="theme-color" content="#712cf9">
     <style>
@@ -76,6 +76,17 @@
 </div>
 
 {% include 'landing/includes/header.html' %}
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 {% block content %}{% endblock %}
 

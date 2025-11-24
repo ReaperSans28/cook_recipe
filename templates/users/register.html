@@ -1,0 +1,43 @@
+{% extends 'landing/base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <h1 class="mb-4 text-center">Регистрация</h1>
+            <form method="post" class="card p-4 shadow-sm">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% for field in form %}
+                    <div class="mb-3">
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                            <div class="form-check">
+                                {{ field }} <label class="form-check-label">{{ field.label }}</label>
+                            </div>
+                        {% else %}
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                        {% endif %}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary w-100">Создать аккаунт</button>
+            </form>
+            <p class="text-center mt-3">
+                Уже есть аккаунт? <a href="{% url 'users:login' %}">Войти</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
