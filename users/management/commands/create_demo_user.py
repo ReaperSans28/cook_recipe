@@ -36,3 +36,4 @@ class Command(BaseCommand):
         user.save(update_fields=["password"])
         self.stdout.write(self.style.SUCCESS(f"Пользователь {user.username} готов"))
 
+

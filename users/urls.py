@@ -10,3 +10,4 @@ urlpatterns = [
     path("logout/", CustomLogoutView.as_view(), name="logout"),
 ]
 
+

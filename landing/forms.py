@@ -41,3 +41,4 @@ class LessonForm(forms.ModelForm):
             "duration_minutes": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
         }
 
+
