@@ -1,10 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import ForeignKey
 from rest_framework.fields import SlugField, IntegerField
 from tinymce.models import HTMLField
 from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth.models import AbstractUser
+User = get_user_model()
 
 # Все поля можно найти в fields. Для этого зажав ctrl нажмите на fields в ссылке: django.db.models.fields
 class Course(models.Model):
@@ -25,7 +26,7 @@ class Course(models.Model):
                               default=Status.DRAFT)
     publish = models.BooleanField(verbose_name="Опубликован ли", default=False)
     author = ForeignKey(
-        AbstractUser,
+        User,
         on_delete=models.CASCADE,
         verbose_name="Автор"
     )
@@ -67,7 +68,7 @@ class Lesson(models.Model):
 
 class TrafficCourse(models.Model):
     user = models.ForeignKey(
-        AbstractUser,
+        User,
         on_delete=models.CASCADE
     )
     course = models.ForeignKey(

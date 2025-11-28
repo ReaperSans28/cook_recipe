@@ -3,15 +3,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-sm-8 col-md-7 py-4">
-                    <h4>О библиотеке</h4>
+                    <h4>О платформе</h4>
                     <p class="text-body-secondary">
-                        Добро пожаловать в нашу библиотеку! Здесь вы найдете книги на любой вкус,
-                        сможете следить за новостями и делиться своими находками.
+                        LearnHub — онлайн-платформа для самообучения. Мы используем Django + DRF, поэтому вы можете
+                        автоматизировать работу через открытые API и быстро выпускать курсы.
                     </p>
                 </div>
                 <div class="col-sm-4 offset-md-1 py-4">
-                    <h4>{% if user.is_authenticated %}Профиль{% else %}Вход{% endif %}</h4>
+                    <h4>{% if user.is_authenticated %}Профиль{% else %}Войти{% endif %}</h4>
                     <ul class="list-unstyled">
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'users:logout' %}" class="text-white">Выйти</a></li>
+                            <li><a href="/api/courses/" class="text-white">API курсов</a></li>
+                            <li><a href="/api/lessons/" class="text-white">API уроков</a></li>
+                        {% else %}
+                            <li><a href="{% url 'users:login' %}" class="text-white">Авторизоваться</a></li>
+                            <li><a href="{% url 'users:register' %}" class="text-white">Регистрация</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -19,11 +27,17 @@
     </div>
     <div class="navbar navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a href="{% url 'landing:index' %}" class="navbar-brand d-flex align-items-center">
-                <strong>Библиотека</strong>
+            <a class="navbar-brand d-flex align-items-center">
+                <strong>LearnHub</strong>
             </a>
-            <div class="d-flex align-items-center">
-                    <span class="text-white me-3">Привет!</span>
+            <div class="d-flex align-items-center gap-3">
+                {% if user.is_authenticated %}
+                    <span class="text-white">Привет, {{ user.get_short_name|default:user.username }}!</span>
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'users:logout' %}">Выйти</a>
+                {% else %}
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'users:login' %}">Войти</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'users:register' %}">Регистрация</a>
+                {% endif %}
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader"
                         aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
