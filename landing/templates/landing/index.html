@@ -12,7 +12,7 @@
                 </p>
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <a class="btn btn-primary btn-lg" href="{% url 'users:register' %}">Начать обучение</a>
-                    {% if user.is_authenticated and user.is_instructor %}
+                    {% if user.is_authenticated and user.is_teacher %}
                         <a class="btn btn-outline-secondary btn-lg" href="{% url 'course_create' %}">Создать курс</a>
                     {% else %}
                         <a class="btn btn-outline-secondary btn-lg" href="{% url 'users:login' %}">Войти</a>
@@ -101,7 +101,7 @@
                     </div>
                 {% endfor %}
             </div>
-            {% if user.is_authenticated and user.is_instructor %}
+            {% if user.is_authenticated and user.is_teacher %}
                 <div class="text-center mt-4">
                     <a class="btn btn-outline-primary" href="{% url 'course_create' %}">Добавить курс</a>
                 </div>
@@ -138,7 +138,7 @@
         </div>
     </section>
 
-    {% if user.is_authenticated and user.is_instructor %}
+    {% if user.is_authenticated and user.is_teacher %}
     <section class="py-5">
         <div class="container">
             <div class="row g-4">

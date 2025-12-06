@@ -11,7 +11,7 @@ class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        exclude = ("instructor", "is_published", "created_at", "updated_at")
+        exclude = ("teacher", "is_published", "created_at", "updated_at")
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "short_description": forms.Textarea(attrs={"class": "form-control", "rows": 2}),
