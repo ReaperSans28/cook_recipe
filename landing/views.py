@@ -108,10 +108,10 @@ class CourseViewSet(ModelViewSet):
     def get_template_name(self):
         """Определяет имя шаблона в зависимости от действия"""
         if self.action == 'retrieve':
-            return 'course_detail.html'
+            return 'landing/course_detail.html'
         elif self.action == 'list':
             return 'course_list.html'
-        return 'course_detail.html'
+        return 'landing/course_detail.html'
 
     def retrieve(self, request, *args, **kwargs):
         """Переопределяем для поддержки HTML и JSON"""
@@ -125,7 +125,7 @@ class CourseViewSet(ModelViewSet):
 
             # Проверяем, нужно ли показать форму редактирования
             if request.GET.get('edit') == 'true' and (request.user == instance.teacher or request.user.is_staff):
-                return render(request, 'course_form.html', context)
+                return render(request, 'landing/course_form.html', context)
 
             return Response(context, template_name=self.get_template_name())
 
@@ -137,7 +137,7 @@ class CourseViewSet(ModelViewSet):
     def detail_html(self, request, pk=None):
         """Альтернативный endpoint для HTML детальной страницы"""
         course = get_object_or_404(Course, pk=pk)
-        return render(request, 'course_detail.html', {'course': course})
+        return render(request, 'landing/course_detail.html', {'course': course})
 
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)

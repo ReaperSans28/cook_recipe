@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'landing/base.html' %}
 {% load static %}
 
 {% block title %}{{ course.title }} - Образовательная платформа{% endblock %}
@@ -8,9 +8,7 @@
     <!-- Хлебные крошки -->
     <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{% url 'home' %}" class="hover:text-blue-600">Главная</a></li>
-            <li><span class="mx-2">/</span></li>
-            <li><a href="{% url 'courses-list' %}" class="hover:text-blue-600">Курсы</a></li>
+            <li><a href="{% url 'landing:home' %}" class="hover:text-blue-600">Главная</a></li>
             <li><span class="mx-2">/</span></li>
             <li class="text-gray-900 font-medium">{{ course.title|truncatechars:30 }}</li>
         </ol>
@@ -35,7 +33,6 @@
                         <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                         </svg>
-                        <span>{{ course.teacher.get_full_name|default:course.teacher.username }}</span>
                     </div>
 
                     <div class="flex items-center text-gray-600">
@@ -74,15 +71,6 @@
 
             <!-- Кнопки действий -->
             <div class="flex flex-wrap gap-4 mt-8">
-                {% if request.user == course.teacher or request.user.is_staff %}
-                    <a href="{% url 'courses-detail' pk=course.pk %}?edit=true"
-                       class="inline-flex items-center px-6 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-900 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                        </svg>
-                        Редактировать
-                    </a>
-                {% endif %}
 
                 {% if course.is_free %}
                     <button class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors">
@@ -124,24 +112,6 @@
                     <div class="flex items-center justify-between">
                         <span class="text-gray-700">Обновлён:</span>
                         <span class="text-gray-900">{{ course.updated_at|date:"d.m.Y" }}</span>
-                    </div>
-                </div>
-
-                <!-- Информация о преподавателе -->
-                <div class="border-t pt-6 mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Преподаватель</h3>
-                    <div class="flex items-center">
-                        {% if course.teacher.avatar %}
-                            <img src="{{ course.teacher.avatar.url }}"
-                                 alt="{{ course.teacher.get_full_name }}"
-                                 class="w-12 h-12 rounded-full mr-4">
-                        {% endif %}
-                        <div>
-                            <h4 class="font-medium text-gray-900">{{ course.teacher.get_full_name|default:course.teacher.username }}</h4>
-                            {% if course.teacher.bio %}
-                                <p class="text-sm text-gray-600 mt-1">{{ course.teacher.bio|truncatechars:60 }}</p>
-                            {% endif %}
-                        </div>
                     </div>
                 </div>
 
