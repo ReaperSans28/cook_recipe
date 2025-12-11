@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .models import Course, Lesson, Teacher
 
 
@@ -12,10 +11,10 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ("title", "course", "order", "is_published")
-    # list_filter = ("is_published",)
-    search_fields = ("title", "course__title")
-    autocomplete_fields = ("course",)
+    list_display = ['title', 'course', 'order', 'is_published', 'created_at']
+    list_filter = ['is_published', 'course']
+    search_fields = ['title', 'content']
+    ordering = ['course', 'order']
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):

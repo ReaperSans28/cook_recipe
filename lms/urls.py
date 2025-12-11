@@ -7,5 +7,3 @@ router.register(r"coursess", CourseViewSet, basename="course")
 router.register(r"lessons", LessonViewSet, basename="lesson")
 
 urlpatterns = router.urls
-
-

@@ -1,7 +1,7 @@
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
+from tinymce.models import HTMLField
 
 User = get_user_model()
 
@@ -86,7 +86,7 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
     )
     title = models.CharField(_("Название урока"), max_length=200)
-    content = models.TextField(_("Контент"))
+    content = HTMLField(_("Контент"))
     video_url = models.URLField(_("Видео"), blank=True, null=True)
     duration_minutes = models.PositiveIntegerField(_("Продолжительность (мин)"), default=1)
     order = models.PositiveIntegerField(_("Порядок"), default=0)

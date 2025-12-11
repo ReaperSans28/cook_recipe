@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -123,13 +124,11 @@ class CourseViewSet(ModelViewSet):
                 'user': request.user
             }
 
-            # Проверяем, нужно ли показать форму редактирования
             if request.GET.get('edit') == 'true' and (request.user == instance.teacher or request.user.is_staff):
                 return render(request, 'landing/course_form.html', context)
 
             return Response(context, template_name=self.get_template_name())
 
-        # Для API возвращаем JSON
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

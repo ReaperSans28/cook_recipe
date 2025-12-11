@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, renderers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -86,15 +86,24 @@ class LessonViewSet(viewsets.ModelViewSet):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    renderer_classes = [
+        renderers.JSONRenderer,
+        renderers.BrowsableAPIRenderer,
+        renderers.TemplateHTMLRenderer,
+    ]
 
     def get_queryset(self):
         user = self.request.user
         base_qs = Lesson.objects.select_related("course", "course__teacher")
+
+        # Для HTML представления возвращаем только опубликованные
+        if hasattr(self.request, 'accepted_renderer') and self.request.accepted_renderer.format == 'html':
+            return base_qs.filter(is_published=True, course__is_published=True)
+
         if not user.is_authenticated:
             return base_qs.filter(is_published=True, course__is_published=True)
         if user.is_staff:
             return base_qs
-        # Инструктор видит все свои уроки вне зависимости от публикации
         return base_qs.filter(
             Q(is_published=True, course__is_published=True) | Q(course__teacher=user)
         )
@@ -111,3 +120,101 @@ class LessonViewSet(viewsets.ModelViewSet):
         if course.teacher != self.request.user:
             raise PermissionDenied("Добавлять уроки можно только в свои курсы.")
         serializer.save()
+
+    def get_lesson_context(self, lesson):
+        """Вспомогательный метод для получения контекста урока"""
+        previous_lesson = Lesson.objects.filter(
+            course=lesson.course,
+            order__lt=lesson.order,
+            is_published=True,
+            course__is_published=True
+        ).order_by('-order').first()
+
+        next_lesson = Lesson.objects.filter(
+            course=lesson.course,
+            order__gt=lesson.order,
+            is_published=True,
+            course__is_published=True
+        ).order_by('order').first()
+
+        def lesson_to_simple_dict(obj):
+            if not obj:
+                return None
+            return {
+                'id': obj.id,
+                'title': obj.title,
+                'order': obj.order,
+                'url': f'/api/lessons/{obj.id}/'
+            }
+
+        lesson_dict = {
+            'id': lesson.id,
+            'title': lesson.title,
+            'content': lesson.content,
+            'video_url': lesson.video_url,
+            'duration_minutes': lesson.duration_minutes,
+            'order': lesson.order,
+            'is_published': lesson.is_published,
+            'created_at': lesson.created_at,
+            'updated_at': lesson.updated_at,
+            'course': {
+                'id': lesson.course.id,
+                'title': lesson.course.title,
+            }
+        }
+
+        return {
+            'lesson': lesson_dict,
+            'previous_lesson': lesson_to_simple_dict(previous_lesson),
+            'next_lesson': lesson_to_simple_dict(next_lesson)
+        }
+
+    @action(detail=True, methods=['get'],
+            renderer_classes=[renderers.TemplateHTMLRenderer],
+            url_path='html')
+    def lesson_html(self, request, *args, **kwargs):
+        """Endpoint для получения HTML представления урока"""
+        lesson = self.get_object()
+
+        if not lesson.is_published or not lesson.course.is_published:
+            if not request.user.is_authenticated:
+                raise PermissionDenied("Урок не найден или не опубликован")
+            if not (request.user.is_staff or request.user == lesson.course.teacher):
+                raise PermissionDenied("Урок не найден или не опубликован")
+
+        context = self.get_lesson_context(lesson)
+        return Response(context, template_name='lms/lesson_detail.html')
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Переопределяем метод retrieve для определения формата ответа
+        """
+        instance = self.get_object()
+
+        accept_header = request.META.get('HTTP_ACCEPT', '')
+        is_html_request = (
+                request.accepted_renderer.format == 'html' or
+                'text/html' in accept_header or
+                request.query_params.get('format') == 'html'
+        )
+
+        if is_html_request and 'application/json' not in accept_header:
+            if not instance.is_published or not instance.course.is_published:
+                if not request.user.is_authenticated:
+                    return Response(
+                        {"detail": "Урок не найден или не опубликован"},
+                        status=status.HTTP_404_NOT_FOUND,
+                        template_name='lms/lesson_not_found.html'
+                    )
+                if not (request.user.is_staff or request.user == instance.course.teacher):
+                    return Response(
+                        {"detail": "Урок не найден или не опубликован"},
+                        status=status.HTTP_404_NOT_FOUND,
+                        template_name='lms/lesson_not_found.html'
+                    )
+
+            context = self.get_lesson_context(instance)
+            return Response(context, template_name='lms/lesson_detail.html')
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

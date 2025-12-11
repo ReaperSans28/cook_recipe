@@ -1,13 +1,11 @@
+from django.utils.html import strip_tags
 from rest_framework import serializers
 
 from .models import Course, Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор урока. Используем ModelSerializer, чтобы DRF автоматически
-    генерировал поля и валидацию на основе модели.
-    """
+    content_preview = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
@@ -16,6 +14,7 @@ class LessonSerializer(serializers.ModelSerializer):
             "course",
             "title",
             "content",
+            "content_preview",
             "video_url",
             "duration_minutes",
             "order",
@@ -24,6 +23,9 @@ class LessonSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = ("id", "created_at", "updated_at")
+
+    def get_content_preview(self, obj):
+        return strip_tags(obj.content)[:200] + "..." if obj.content else ""
 
 
 class CourseSerializer(serializers.ModelSerializer):
